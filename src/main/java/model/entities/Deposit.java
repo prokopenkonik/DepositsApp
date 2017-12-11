@@ -1,6 +1,11 @@
 package model.entities;
 
-public class Deposit {
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
+
+public class Deposit implements Externalizable {
     private String name;
     private Bank bank;
     private int minSum;
@@ -82,8 +87,11 @@ public class Deposit {
 
     @Override
     public String toString() {
-        return name + " " + bank.getName() + " " + minSum + " " + term + " " + percent + " "
-                + isPretermWithdraw + " " + isReplenish;
+        return "Банк: " + bank.getName() + ", депозит: " + name + "\n"
+                + "Мин. сумма = " + minSum + " грн., срок - " + term + " мес." + "\n"
+                +  "Ставка - " + percent + "%\n" + "Досрочное снятие - "
+                + (isPretermWithdraw ? "да":"нет") + ", пополнение - "
+                + (isReplenish? "да":"нет") + "\n";
     }
 
     @Override
@@ -102,5 +110,23 @@ public class Deposit {
                 && !(this.percent != other.percent)
                 && this.isPretermWithdraw == other.isPretermWithdraw
                 && this.isReplenish == other.isReplenish;
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeUTF(name);
+        out.writeInt(minSum);
+        out.writeInt(term);
+        out.writeDouble(percent);
+        out.writeBoolean(isPretermWithdraw);
+        out.writeBoolean(isReplenish);
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        name = in.readUTF();
+        minSum = in.readInt();
+        term = in.readInt();
+        percent = in.readDouble();
+        isPretermWithdraw = in.readBoolean();
+        isReplenish = in.readBoolean();
     }
 }

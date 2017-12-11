@@ -12,6 +12,12 @@ import java.util.List;
 import static view.constants.IMenuConstants.*;
 
 public class Controller {
+    private static final int FROM_COMMAND = 0;
+    private static final int TO_COMMAND_MAIN_MENU = 2;
+    private static final int TO_COMMAND_SORTING_MENU = 4;
+    private static final int FROM_COMMAND_CHOICE = 1;
+    private static final int TO_COMMAND_CHOICE = 2;
+
     private Viewer viewer;
     private DepositsManager depositsManager;
 
@@ -25,7 +31,7 @@ public class Controller {
             viewer.showMenu();
             MainCommand mainCommand = intToCommand(
                     InputUtility.inputCommandNumber(
-                            viewer, 0, 2));
+                            viewer, FROM_COMMAND, TO_COMMAND_MAIN_MENU));
 
             switch (mainCommand) {
                 case GET_ALL_DEPOSITS:
@@ -46,30 +52,34 @@ public class Controller {
     }
 
     private void offerSorting(List<Deposit> deposits) {
-        viewer.showMenuForSorting();
-        SortingCommand sortingCommand = intToSortingCommand(
-                InputUtility.inputCommandNumber(
-                        viewer, 0, 4));
-        boolean isSorted = true;
-        switch (sortingCommand) {
-            case SORT_BY_BANK:
-                DepositSort.sortByBankName(deposits);
-                break;
-            case SORT_BY_PERCENT:
-                DepositSort.sortByPercent(deposits);
-                break;
-            case SORT_BY_NAME:
-                DepositSort.sortByDepositName(deposits);
-                break;
-            case BACK_TO_MAIN_MENU:
-                isSorted = false;
-                break;
-            case EXIT:
-                System.exit(0);
-                break;
-        }
-        if (isSorted) {
-            viewer.showResult(deposits);
+        boolean backToMainMenu = false;
+        while (!backToMainMenu) {
+            viewer.showMenuForSorting();
+            SortingCommand sortingCommand = intToSortingCommand(
+                    InputUtility.inputCommandNumber(
+                            viewer, FROM_COMMAND, TO_COMMAND_SORTING_MENU));
+            boolean isSorted = true;
+            switch (sortingCommand) {
+                case SORT_BY_BANK:
+                    DepositSort.sortByBankName(deposits);
+                    break;
+                case SORT_BY_PERCENT:
+                    DepositSort.sortByPercent(deposits);
+                    break;
+                case SORT_BY_NAME:
+                    DepositSort.sortByDepositName(deposits);
+                    break;
+                case BACK_TO_MAIN_MENU:
+                    backToMainMenu = true;
+                    isSorted = false;
+                    break;
+                case EXIT:
+                    System.exit(0);
+                    break;
+            }
+            if (isSorted) {
+                viewer.showResult(deposits);
+            }
         }
     }
 
@@ -79,7 +89,7 @@ public class Controller {
 
         viewer.showMessage(INPUT_CHOICE);
         int choiceCommand = InputUtility.inputCommandNumber(
-                viewer, 1, 2);
+                viewer, FROM_COMMAND_CHOICE, TO_COMMAND_CHOICE);
 
         if (choiceCommand == 1) {
             String bankName = InputUtility.inputString(viewer, INPUT_BANK_NAME);
@@ -95,7 +105,7 @@ public class Controller {
     private boolean getBoolean(String message) {
         viewer.showMessage(message);
         int commandForBoolean = InputUtility.inputCommandNumber(viewer,
-                1, 2);
+                FROM_COMMAND_CHOICE, TO_COMMAND_CHOICE);
 
         return intToBoolean(commandForBoolean);
     }
